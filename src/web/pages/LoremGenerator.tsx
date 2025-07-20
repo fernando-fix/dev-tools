@@ -5,6 +5,8 @@ export default function LoremGenerator() {
 
     const [qttWords, setQttWords] = useState<number>(50);
     const [words, setWords] = useState('');
+    const [copied, setCopied] = useState(false);
+
     const arrayWords: string[] = [
         'lorem',
         'ipsum',
@@ -39,6 +41,10 @@ export default function LoremGenerator() {
     const clearLorem = () => {
         setWords('');
     }
+    const copyAlert = () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+    }
 
     return (
         <Default pageTitle="Gerador de Lorem Ipsum">
@@ -63,8 +69,9 @@ export default function LoremGenerator() {
                 <textarea className="mt-4 w-full px-3 py-2 rounded-md bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" rows={10} readOnly spellCheck={false} defaultValue={words} />
 
                 {words.length > 0 &&
-                    <button onClick={() => navigator.clipboard.writeText(words)} className="mt-4 w-full px-3 py-2 rounded-md bg-green-500 text-black hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer">
-                        Copiar texto
+                    <button onClick={() => navigator.clipboard.writeText(words).then(() => copyAlert())} className="mt-4 w-full px-3 py-2 rounded-md bg-green-500 text-black hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer">
+                        {!copied && 'Copiar texto'}
+                        {copied && 'Texto copiado✅'}
                     </button>
                 }
             </div>
