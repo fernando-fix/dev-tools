@@ -15,13 +15,15 @@ export default function QRCodeGenerator() {
   const [showQR, setShowQR] = useState(false);
   const [qrText, setQrText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [qrKey, setQrKey] = useState(0); // Para forçar reload
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrText)}&size=${size}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrText)}&size=${size}&_=${qrKey}`;
 
   const handleGenerate = () => {
     setShowQR(false);
     setLoading(true);
     setQrText(text);
+    setQrKey(Date.now()); // Atualiza para forçar reload
   };
 
   const handleImageLoad = () => {
@@ -99,6 +101,7 @@ export default function QRCodeGenerator() {
                 className={`mb-4 border border-gray-600 rounded-lg bg-white ${loading ? 'hidden' : ''}`}
                 style={{ maxWidth: "100%", height: "auto" }}
                 onLoad={handleImageLoad}
+                key={qrKey} // Força o React a recriar o elemento
               />
             )}
             {!loading && showQR && qrText.trim() && (
