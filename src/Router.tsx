@@ -6,6 +6,7 @@ import NotFound from './web/pages/NotFound';
 import ImageConverter from './web/pages/ImageConverter';
 import Base64 from './web/pages/Base64';
 import ImageGenerator from './web/pages/ImageGenerator';
+import TikTokDownloader from './web/pages/TikTokDownloader';
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
       <Route path="/conversor-de-imagens" element={<ImageConverter />} />
       <Route path="/base64" element={<Base64 />} />
       <Route path="/gerador-de-imagem" element={<ImageGenerator />} />
+      <Route path="/baixar-tiktok" element={<TikTokDownloader />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -6,4 +6,5 @@ export const sidebarRoutes: Route[] = [
     { url: "/conversor-de-imagens", label: "Conversor de imagens" },
     { url: "/base64", label: "Encoder/Decoder Base64" },
     { url: "/gerador-de-imagem", label: "Gerador de imagem" },
+    { url: "/baixar-tiktok", label: "Baixar TikTok" },
 ]
