@@ -3,7 +3,7 @@ import Default from "../layouts/Default";
 
 export default function LoremGenerator() {
 
-    const [qttWords, setQttWords] = useState(50);
+    const [qttWords, setQttWords] = useState<number>(50);
     const [words, setWords] = useState('');
     const arrayWords: string[] = [
         'lorem',
@@ -20,7 +20,6 @@ export default function LoremGenerator() {
         'erat',
     ];
 
-
     const generateLorem = () => {
         if (isNaN(qttWords) || qttWords < 1) {
             setQttWords(1);
@@ -31,7 +30,7 @@ export default function LoremGenerator() {
             alert('Por favor, insira um número menor ou igual a 500');
             setQttWords(500);
             return;
-        };
+        }
         const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
         const text = Array.from({ length: qttWords }, () => arrayWords[random(0, arrayWords.length - 1)]).join(' ').replace(/^./, match => match.toUpperCase()).concat('. ');
         setWords(words + text);
@@ -43,10 +42,14 @@ export default function LoremGenerator() {
 
     return (
         <Default pageTitle="Gerador de Lorem Ipsum">
+            <meta name="description" content="As melhores ferramentas de desenvolvimento em um unico lugar." />
             <div className="max-w-[900px]">
                 <div className="flex flex-col space-y-4">
                     <label htmlFor="words" className="text-lg font-semibold">Número de palavras:</label>
-                    <input type="number" id="words" min="1" value={qttWords} defaultValue={qttWords} onChange={(e) => setQttWords(parseInt(e.target.value))} className="w-full px-3 py-2 rounded-md bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="number" id="words" min="1" value={qttWords} onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        setQttWords(isNaN(value) ? 0 : value);
+                    }} className="w-full px-3 py-2 rounded-md bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div className="flex justify-between gap-2">
                     <button onClick={generateLorem} className="mt-4 w-full px-3 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
@@ -64,9 +67,7 @@ export default function LoremGenerator() {
                         Copiar texto
                     </button>
                 }
-
             </div>
-
         </Default>
     )
 }
