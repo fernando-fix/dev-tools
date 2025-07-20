@@ -7,6 +7,7 @@ import ImageConverter from './web/pages/ImageConverter';
 import Base64 from './web/pages/Base64';
 import ImageGenerator from './web/pages/ImageGenerator';
 import TikTokDownloader from './web/pages/TikTokDownloader';
+import QRCodeGenerator from './web/pages/QRCodeGenerator';
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/base64" element={<Base64 />} />
       <Route path="/gerador-de-imagem" element={<ImageGenerator />} />
       <Route path="/baixar-tiktok" element={<TikTokDownloader />} />
+      <Route path="/qrcode" element={<QRCodeGenerator />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
