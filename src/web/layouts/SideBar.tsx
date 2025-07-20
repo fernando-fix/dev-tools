@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { sidebarRoutes } from "../data/sidebarRoutes";
 
 export default function SideBar() {
+    const [filter, setFilter] = useState("");
+
     return (
         <>
             {/* Sidebar */}
@@ -12,23 +15,40 @@ export default function SideBar() {
                         </svg>
                         <span>DEV TOOLS</span>
                     </div>
-                    <input type="text" placeholder="Filtrar" className="w-full px-3 py-2 rounded-md bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
-                    <nav className="flex flex-col space-y-2">
-
-                        {/* Foreach de rotas */}
-                        {sidebarRoutes.map((route, index) => (
-                            <a
-                                key={index}
-                                href={route.url}
-                                className={`w-full text-left px-4 py-2 rounded-md hover:bg-blue-500 ${route.url === document.location.pathname ? 'bg-blue-500' : 'bg-gray-500'}`}
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Filtrar"
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                            className="w-full px-3 py-2 rounded-md bg-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        {filter && (
+                            <button
+                                onClick={() => setFilter('')}
+                                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                             >
-                                {route.label}
-                            </a>
-                        ))}
-
+                                &times;
+                            </button>
+                        )}
+                    </div>
+                    <nav className="flex flex-col space-y-2">
+                        {/* Filtered routes */}
+                        {sidebarRoutes
+                            .filter((route) => route.label.toLowerCase().includes(filter.toLowerCase()))
+                            .map((route, index) => (
+                                <a
+                                    key={index}
+                                    href={route.url}
+                                    className={`w-full text-left px-4 py-2 rounded-md hover:bg-blue-500 ${route.url === document.location.pathname ? 'bg-blue-500' : 'bg-gray-500'}`}
+                                >
+                                    {route.label}
+                                </a>
+                            ))}
                     </nav>
                 </div>
             </aside>
         </>
     );
 }
+
