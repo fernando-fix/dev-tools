@@ -16,12 +16,20 @@ export default function ImageGenerator() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // Cálculo proporcional do tamanho da fonte
-    const fontSize = Math.max(10, Math.floor(Math.min(largura, altura) / 4));
+    const minFontSize = 10;
+    const maxFontSize = Math.max(minFontSize, Math.floor(Math.min(largura, altura) / 2));
+    const defaultFontSize = Math.max(minFontSize, Math.floor(Math.min(largura, altura) / 4));
+    const [fontSize, setFontSize] = useState(defaultFontSize);
+
+    // Atualiza o fontSize se o tamanho da imagem mudar
+    React.useEffect(() => {
+        setFontSize(defaultFontSize);
+    }, [largura, altura]);
 
     // Gera SVG string
     const gerarSVG = () => {
         const texto = `${largura}x${altura}`;
-        return `<?xml version='1.0' encoding='UTF-8'?>\n<svg viewBox='0 0 ${largura} ${altura}' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='${bgColor}'/><text x='50%' y='50%' dy='.35em' text-anchor='middle' font-size='${fontSize}' fill='${textColor}' font-family='Arial, sans-serif'>${texto}</text></svg>`;
+        return `<?xml version='1.0' encoding='UTF-8'?>\n<svg viewBox='0 0 ${largura} ${altura}' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='${bgColor}'/><text x='50%' y='50%' dy='.32em' text-anchor='middle' dominant-baseline='middle' alignment-baseline='middle' font-size='${fontSize}' fill='${textColor}' font-family='Arial, sans-serif'>${texto}</text></svg>`;
     };
 
     // Desenha no canvas
@@ -45,7 +53,7 @@ export default function ImageGenerator() {
         if (extensao !== "svg") {
             desenharCanvas();
         }
-    }, [largura, altura, bgColor, textColor, extensao]);
+    }, [largura, altura, bgColor, textColor, extensao, fontSize]);
 
     // Função para formatar tamanho
     const formatFileSize = (bytes: number): string => {
@@ -78,7 +86,7 @@ export default function ImageGenerator() {
                 setDownloadSize(formatFileSize(blob.size));
             }, mime, qualityValue);
         }
-    }, [largura, altura, bgColor, textColor, extensao, quality]);
+    }, [largura, altura, bgColor, textColor, extensao, quality, fontSize]);
 
     // Download
     const baixar = () => {
@@ -210,6 +218,17 @@ export default function ImageGenerator() {
                                     />
                                 </div>
                             )}
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium mb-2">Tamanho da Fonte: {fontSize}px</label>
+                                <input
+                                    type="range"
+                                    min={minFontSize}
+                                    max={maxFontSize}
+                                    value={fontSize}
+                                    onChange={e => setFontSize(Number(e.target.value))}
+                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                />
+                            </div>
                         </div>
                         <button onClick={baixar} className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-colors duration-200 text-lg font-semibold">Salvar Imagem</button>
                         <div className="text-center text-xs text-gray-400 mt-2">Tamanho do arquivo: {downloadSize}</div>
