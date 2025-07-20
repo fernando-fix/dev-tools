@@ -25,7 +25,7 @@ export default function ImageConverter() {
     const [imagensCarregadas, setImagensCarregadas] = useState<ImageData[]>([]);
     const [imagemSelecionadaIndex, setImagemSelecionadaIndex] = useState<number>(0);
     const [effectType, setEffectType] = useState<string>("pixel");
-    const [effectLevel, setEffectLevel] = useState<number>(8);
+    const [effectLevel, setEffectLevel] = useState<number>(24);
     const [quality, setQuality] = useState<number>(90);
     const [isDragOver, setIsDragOver] = useState<boolean>(false);
     const [fileSizes, setFileSizes] = useState<FileSizes>({
@@ -65,10 +65,11 @@ export default function ImageConverter() {
     };
 
     const handleFileSelect = (files: FileList) => {
-        const newImagens: ImageData[] = [];
         const filesArray = Array.from(files);
-        
-        filesArray.forEach((file) => {
+        const novasImagens: ImageData[] = [];
+
+        let loadedCount = 0;
+        filesArray.forEach((file, idx) => {
             const reader = new FileReader();
             reader.onload = function (e) {
                 const img = new Image();
@@ -76,13 +77,15 @@ export default function ImageConverter() {
                     const nomeArquivo = file.name.split(".").slice(0, -1).join(".");
                     const extension = file.name.split(".").pop() || "";
                     const fileSize = file.size;
-                    
-                    const newImageData: ImageData = { img, nomeArquivo, extension, fileSize };
-                    newImagens.push(newImageData);
-                    
-                    if (newImagens.length === filesArray.length) {
-                        setImagensCarregadas(newImagens);
-                        setImagemSelecionadaIndex(0);
+                    novasImagens.push({ img, nomeArquivo, extension, fileSize });
+                    loadedCount++;
+                    if (loadedCount === filesArray.length) {
+                        // Se o input não tem imagens ainda, sobrescreve. Se já tem, concatena.
+                        setImagensCarregadas(prev => {
+                            const resultado = prev.length === 0 ? novasImagens : [...prev, ...novasImagens];
+                            setImagemSelecionadaIndex(resultado.length - 1); // Seleciona a última imagem adicionada
+                            return resultado;
+                        });
                     }
                 };
                 img.src = e.target?.result as string;
@@ -376,16 +379,15 @@ export default function ImageConverter() {
                         <div className="flex justify-center gap-4 flex-wrap">
                             {imagensCarregadas.map((item, index) => (
                                 <div key={index} className="relative group">
-                                    <div className={`relative rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                                    <div className={`relative rounded-lg overflow-hidden border-2 transition-all duration-200 cursor-pointer ${
                                         index === imagemSelecionadaIndex 
                                             ? 'border-blue-500 shadow-lg shadow-blue-500/25' 
                                             : 'border-gray-600 hover:border-gray-500'
-                                    }`}>
+                                    }`} onClick={() => selecionarImagem(index)}>
                                         <img
                                             src={item.img.src}
                                             alt={item.nomeArquivo}
-                                            className="w-24 h-24 object-cover cursor-pointer"
-                                            onClick={() => selecionarImagem(index)}
+                                            className="w-24 h-24 object-cover"
                                         />
                                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200"></div>
                                     </div>
