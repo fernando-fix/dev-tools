@@ -6,7 +6,7 @@ import Router from './Router';
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename="/dev-tools/">
       <Router />
     </BrowserRouter>
   </React.StrictMode>,

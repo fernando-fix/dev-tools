@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { sidebarRoutes } from "../data/sidebarRoutes";
+import { Link } from "react-router-dom";
 
 export default function SideBar() {
     const [filter, setFilter] = useState("");
@@ -37,13 +38,13 @@ export default function SideBar() {
                         {sidebarRoutes
                             .filter((route) => route.label.toLowerCase().includes(filter.toLowerCase()))
                             .map((route, index) => (
-                                <a
+                                <Link
                                     key={index}
-                                    href={route.url}
+                                    to={route.url}
                                     className={`w-full text-left px-4 py-2 rounded-md hover:bg-blue-500 ${route.url === document.location.pathname ? 'bg-blue-500' : 'bg-gray-500'}`}
                                 >
                                     {route.label}
-                                </a>
+                                </Link>
                             ))}
                     </nav>
                 </div>
