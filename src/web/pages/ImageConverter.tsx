@@ -69,7 +69,7 @@ export default function ImageConverter() {
         const novasImagens: ImageData[] = [];
 
         let loadedCount = 0;
-        filesArray.forEach((file, idx) => {
+        filesArray.forEach((file) => {
             const reader = new FileReader();
             reader.onload = function (e) {
                 const img = new Image();

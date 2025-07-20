@@ -49,7 +49,7 @@ export default function LoremGenerator() {
     return (
         <Default pageTitle="Gerador de Lorem Ipsum">
             <meta name="description" content="As melhores ferramentas de desenvolvimento em um unico lugar." />
-            <div className="max-w-[900px]">
+            <div className="mx-auto max-w-[1090px]">
                 <div className="flex flex-col space-y-4">
                     <label htmlFor="words" className="text-lg font-semibold">Número de palavras:</label>
                     <input type="number" id="words" min="1" value={qttWords} onChange={(e) => {
