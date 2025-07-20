@@ -38,11 +38,10 @@ export default function SideBar() {
                         {sidebarRoutes
                             .filter((route) => route.label.toLowerCase().includes(filter.toLowerCase()))
                             .map((route, index) => (
-                                console.log(route.url, document.location.pathname),
                                 <Link
                                     key={index}
                                     to={route.url}
-                                    className={`w-full text-left px-4 py-2 rounded-md hover:bg-blue-500 ${'/dev-tools' + route.url === document.location.pathname ? 'bg-blue-500' : 'bg-gray-500'}`}
+                                    className={`w-full text-left px-4 py-2 rounded-md hover:bg-blue-500 ${window.location.hash === `#${route.url}` ? 'bg-blue-500' : 'bg-gray-500'}`}
                                 >
                                     {route.label}
                                 </Link>
