@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { QRCodeCanvas } from "qrcode.react";
+import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
 import Default from "../layouts/Default";
 
 const SIZES = [
@@ -17,7 +17,8 @@ export default function QRCodeGenerator() {
   const [qrText, setQrText] = useState("");
   const [loading, setLoading] = useState(false);
   const [margin, setMargin] = useState(1);
-  const qrRef = useRef<HTMLDivElement>(null);
+  const qrCanvasRef = useRef<HTMLDivElement>(null);
+  const qrSVGRef = useRef<HTMLDivElement>(null);
 
   const width = parseInt(size.split("x")[0]);
   const height = parseInt(size.split("x")[1]);
@@ -33,24 +34,24 @@ export default function QRCodeGenerator() {
   };
 
   const handleDownload = async (format: string) => {
-    if (!qrRef.current) return;
-    const qrNode = qrRef.current.querySelector("canvas, svg");
-    if (!qrNode) return;
-    if (format === "png") {
-      // Canvas para PNG
+    if (format === "png" || format === "webp") {
+      if (!qrCanvasRef.current) return;
+      const qrNode = qrCanvasRef.current.querySelector("canvas");
+      if (!qrNode) return;
       const canvas = qrNode as HTMLCanvasElement;
-      const url = canvas.toDataURL("image/png");
+      const url = canvas.toDataURL(format === "webp" ? "image/webp" : "image/png");
       const a = document.createElement("a");
       a.href = url;
-      a.download = `qrcode.png`;
+      a.download = `qrcode.${format}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
     } else if (format === "svg") {
-      // SVG para arquivo
-      const svg = qrNode as SVGSVGElement;
-      const serializer = new XMLSerializer();
-      const source = serializer.serializeToString(svg);
+      if (!qrSVGRef.current) return;
+      const qrNode = qrSVGRef.current.querySelector("svg");
+      if (!qrNode) return;
+      const svg = qrNode as SVGElement;
+      const source = new XMLSerializer().serializeToString(svg);
       const blob = new Blob([source], { type: "image/svg+xml" });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -124,33 +125,66 @@ export default function QRCodeGenerator() {
               </div>
             )}
             {qrText.trim() && (
-              <div ref={qrRef} className={` mb-5 ${loading ? 'hidden' : ''}`}
-                style={{ width, height, display: loading ? 'none' : undefined }}>
-                <QRCodeCanvas
-                  value={qrText}
-                  size={width}
-                  bgColor="#ffffff"
-                  fgColor="#000000"
-                  level="Q"
-                  marginSize={margin}
-                  includeMargin={true}
-                />
-              </div>
+              <>
+                {/* Canvas para PNG/WebP */}
+                <div ref={qrCanvasRef} style={{ display: 'none' }}>
+                  <QRCodeCanvas
+                    value={qrText}
+                    size={width}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    level="Q"
+                    marginSize={margin}
+                    includeMargin={true}
+                  />
+                </div>
+                {/* SVG para SVG */}
+                <div ref={qrSVGRef} style={{ display: 'none' }}>
+                  <QRCodeSVG
+                    value={qrText}
+                    size={width}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    level="Q"
+                    marginSize={margin}
+                    includeMargin={true}
+                  />
+                </div>
+                {/* Exibição normal (Canvas) */}
+                <div className={` mb-5 ${loading ? 'hidden' : ''}`}
+                  style={{ width, height, display: loading ? 'none' : undefined }}>
+                  <QRCodeCanvas
+                    value={qrText}
+                    size={width}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    level="Q"
+                    marginSize={margin}
+                    includeMargin={true}
+                  />
+                </div>
+              </>
             )}
             {!loading && showQR && qrText.trim() && (
               <>
                 <div className="flex gap-4 mb-4">
                   <button
-                    onClick={() => handleDownload("png")}
-                    className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer transition-colors duration-200 text-lg font-semibold"
-                  >
-                    Baixar PNG
-                  </button>
-                  <button
                     onClick={() => handleDownload("svg")}
                     className="px-6 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 cursor-pointer transition-colors duration-200 text-lg font-semibold"
                   >
                     Baixar SVG
+                  </button>
+                  <button
+                    onClick={() => handleDownload("webp")}
+                    className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer transition-colors duration-200 text-lg font-semibold"
+                  >
+                    Baixar WebP
+                  </button>
+                  <button
+                    onClick={() => handleDownload("png")}
+                    className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer transition-colors duration-200 text-lg font-semibold"
+                  >
+                    Baixar PNG
                   </button>
                 </div>
                 <div className="text-center text-gray-300 text-sm break-all">
