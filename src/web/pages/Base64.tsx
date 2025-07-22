@@ -4,30 +4,21 @@ import Default from "../layouts/Default";
 export default function Base64() {
     const [inputText, setInputText] = useState<string>("");
     const [outputText, setOutputText] = useState<string>("");
-    const [mode, setMode] = useState<"encode" | "decode">("encode");
     const [copied, setCopied] = useState<boolean>(false);
 
-    const encodeText = (text: string): string => {
+    const encodeText = (text: string): void => {
         try {
-            return btoa(unescape(encodeURIComponent(text)));
+            setOutputText(btoa(unescape(encodeURIComponent(text))));
         } catch (error) {
-            return "Erro ao codificar o texto";
+            alert("Erro ao codificar o texto.");
         }
     };
 
-    const decodeText = (text: string): string => {
+    const decodeText = (text: string): void => {
         try {
-            return decodeURIComponent(escape(atob(text)));
+            setOutputText(decodeURIComponent(escape(atob(text))));
         } catch (error) {
-            return "Erro ao decodificar o texto. Verifique se o texto é um Base64 válido.";
-        }
-    };
-
-    const handleProcess = () => {
-        if (mode === "encode") {
-            setOutputText(encodeText(inputText));
-        } else {
-            setOutputText(decodeText(inputText));
+            alert("Erro ao decodificar o texto.");
         }
     };
 
@@ -70,8 +61,7 @@ export default function Base64() {
                         <div className="flex gap-3 mt-4">
                             <button
                                 onClick={() => {
-                                    setMode("encode");
-                                    handleProcess();
+                                    encodeText(inputText);
                                 }}
                                 className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
                             >
@@ -79,8 +69,7 @@ export default function Base64() {
                             </button>
                             <button
                                 onClick={() => {
-                                    setMode("decode");
-                                    handleProcess();
+                                    decodeText(inputText);
                                 }}
                                 className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 cursor-pointer"
                             >

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { QRCodeCanvas } from "qrcode.react";
 import Default from "../layouts/Default";
 
 const SIZES = [
@@ -15,33 +16,51 @@ export default function QRCodeGenerator() {
   const [showQR, setShowQR] = useState(false);
   const [qrText, setQrText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [qrKey, setQrKey] = useState(0); // Para forçar reload
+  const [margin, setMargin] = useState(1);
+  const qrRef = useRef<HTMLDivElement>(null);
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrText)}&size=${size}&_=${qrKey}`;
+  const width = parseInt(size.split("x")[0]);
+  const height = parseInt(size.split("x")[1]);
 
   const handleGenerate = () => {
     setShowQR(false);
     setLoading(true);
     setQrText(text);
-    setQrKey(Date.now()); // Atualiza para forçar reload
-  };
-
-  const handleImageLoad = () => {
-    setLoading(false);
-    setShowQR(true);
+    setTimeout(() => {
+      setLoading(false);
+      setShowQR(true);
+    }, 300); // Simula carregamento
   };
 
   const handleDownload = async (format: string) => {
-    const response = await fetch(qrUrl);
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `qrcode.${format}`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
+    if (!qrRef.current) return;
+    const qrNode = qrRef.current.querySelector("canvas, svg");
+    if (!qrNode) return;
+    if (format === "png") {
+      // Canvas para PNG
+      const canvas = qrNode as HTMLCanvasElement;
+      const url = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `qrcode.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } else if (format === "svg") {
+      // SVG para arquivo
+      const svg = qrNode as SVGSVGElement;
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svg);
+      const blob = new Blob([source], { type: "image/svg+xml" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `qrcode.svg`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    }
   };
 
   return (
@@ -71,6 +90,18 @@ export default function QRCodeGenerator() {
               ))}
             </select>
           </div>
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">Tamanho da margem</label>
+            <input
+              type="number"
+              value={margin}
+              onChange={e => setMargin(parseInt(e.target.value) || 0)}
+              placeholder="0"
+              min={0}
+              max={5}
+              className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white"
+            />
+          </div>
           <button
             onClick={handleGenerate}
             disabled={!text.trim()}
@@ -84,7 +115,7 @@ export default function QRCodeGenerator() {
           <div className="bg-gray-800 rounded-xl p-8 border border-gray-700 flex flex-col items-center">
             <h3 className="text-lg font-semibold mb-4 text-center">QR Code Gerado</h3>
             {loading && (
-              <div className="flex flex-col items-center justify-center mb-4">
+              <div className={`flex flex-col items-center justify-center mb-4 h-full w-full`}>
                 <svg className="animate-spin h-8 w-8 text-blue-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
@@ -93,16 +124,18 @@ export default function QRCodeGenerator() {
               </div>
             )}
             {qrText.trim() && (
-              <img
-                src={qrUrl}
-                alt="QR Code"
-                width={parseInt(size.split("x")[0])}
-                height={parseInt(size.split("x")[1])}
-                className={`mb-4 border border-gray-600 rounded-lg bg-white ${loading ? 'hidden' : ''}`}
-                style={{ maxWidth: "100%", height: "auto" }}
-                onLoad={handleImageLoad}
-                key={qrKey} // Força o React a recriar o elemento
-              />
+              <div ref={qrRef} className={` mb-5 ${loading ? 'hidden' : ''}`}
+                style={{ width, height, display: loading ? 'none' : undefined }}>
+                <QRCodeCanvas
+                  value={qrText}
+                  size={width}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="Q"
+                  marginSize={margin}
+                  includeMargin={true}
+                />
+              </div>
             )}
             {!loading && showQR && qrText.trim() && (
               <>
@@ -114,10 +147,10 @@ export default function QRCodeGenerator() {
                     Baixar PNG
                   </button>
                   <button
-                    onClick={() => handleDownload("jpg")}
+                    onClick={() => handleDownload("svg")}
                     className="px-6 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 cursor-pointer transition-colors duration-200 text-lg font-semibold"
                   >
-                    Baixar JPG
+                    Baixar SVG
                   </button>
                 </div>
                 <div className="text-center text-gray-300 text-sm break-all">

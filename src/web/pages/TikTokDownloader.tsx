@@ -51,7 +51,7 @@ export default function TikTokDownloader() {
                         disabled={loading}
                         className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-colors duration-200 text-lg font-semibold disabled:opacity-60"
                     >
-                        {loading ? "Buscando..." : "Baixar Vídeo"}
+                        {loading ? "Buscando..." : "Carregar Vídeo"}
                     </button>
                     {error && <div className="text-red-400 text-sm mt-4 text-center">{error}</div>}
                 </div>
@@ -67,6 +67,7 @@ export default function TikTokDownloader() {
                         <a
                             href={videoData.play}
                             download
+                            target="_blank"
                             className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer transition-colors duration-200 text-lg font-semibold"
                         >
                             Baixar Vídeo
