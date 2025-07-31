@@ -8,4 +8,5 @@ export const sidebarRoutes: Route[] = [
     { url: "/gerador-de-imagem", label: "Gerador de imagem" },
     { url: "/baixar-tiktok", label: "Baixar TikTok" },
     { url: "/qrcode", label: "Gerador de QR Code" },
+    { url: "/redimensionar-imagem", label: "Redimensionar Imagem" },
 ]
