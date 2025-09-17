@@ -11,4 +11,5 @@ export const sidebarRoutes: Route[] = [
     { url: "/redimensionar-imagem", label: "Redimensionar Imagem" },
     { url: "/recortar-imagem", label: "Recortar Imagem" },
     { url: "/gerador-de-link-wpp", label: "Gerador de link WPP" },
+    { url: "/gerador-de-cpf-cnpj", label: "Gerador de CPF e CNPJ" },
 ]

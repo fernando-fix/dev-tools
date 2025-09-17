@@ -11,6 +11,7 @@ import QRCodeGenerator from './web/pages/QRCodeGenerator';
 import ImageResizer from './web/pages/ImageResizer';
 import ImageCropper from './web/pages/ImageCropper';
 import WppLinkGenerator from './web/pages/WppLinkGenerator';
+import CpfCnpjGenerator from './web/pages/CpfCnpjGenerator';
 
 function Router() {
   return (
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/redimensionar-imagem" element={<ImageResizer />} />
       <Route path="/recortar-imagem" element={<ImageCropper />} />
       <Route path="/gerador-de-link-wpp" element={<WppLinkGenerator />} />
+      <Route path="/gerador-de-cpf-cnpj" element={<CpfCnpjGenerator />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
