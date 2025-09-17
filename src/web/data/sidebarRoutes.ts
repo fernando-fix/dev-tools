@@ -9,4 +9,6 @@ export const sidebarRoutes: Route[] = [
     { url: "/baixar-tiktok", label: "Baixar TikTok" },
     { url: "/qrcode", label: "Gerador de QR Code" },
     { url: "/redimensionar-imagem", label: "Redimensionar Imagem" },
+    { url: "/recortar-imagem", label: "Recortar Imagem" },
+    { url: "/gerador-de-link-wpp", label: "Gerador de link WPP" },
 ]

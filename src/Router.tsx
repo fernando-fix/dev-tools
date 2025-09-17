@@ -9,6 +9,8 @@ import ImageGenerator from './web/pages/ImageGenerator';
 import TikTokDownloader from './web/pages/TikTokDownloader';
 import QRCodeGenerator from './web/pages/QRCodeGenerator';
 import ImageResizer from './web/pages/ImageResizer';
+import ImageCropper from './web/pages/ImageCropper';
+import WppLinkGenerator from './web/pages/WppLinkGenerator';
 
 function Router() {
   return (
@@ -21,6 +23,8 @@ function Router() {
       <Route path="/baixar-tiktok" element={<TikTokDownloader />} />
       <Route path="/qrcode" element={<QRCodeGenerator />} />
       <Route path="/redimensionar-imagem" element={<ImageResizer />} />
+      <Route path="/recortar-imagem" element={<ImageCropper />} />
+      <Route path="/gerador-de-link-wpp" element={<WppLinkGenerator />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
