@@ -4,17 +4,12 @@ import type { EmojiClickData } from 'emoji-picker-react';
 import Default from "../layouts/Default";
 
 const formatPhone = (value: string) => {
-    // Remove tudo que não for dígito
     const numbers = value.replace(/\D/g, '');
-    
-    // Se não tiver número, retorna vazio
     if (!numbers) return '';
-    
-    // Pega o DDD (2 primeiros dígitos) e o resto do número
+
     const ddd = numbers.substring(0, 2);
     const numberPart = numbers.substring(2);
-    
-    // Formata o número baseado no comprimento
+
     if (numberPart.length <= 5) {
         return `(${ddd}) ${numberPart}`;
     } else {
@@ -32,10 +27,13 @@ export default function WppLinkGenerator() {
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
     const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-    // Fechar o emoji picker ao clicar fora
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (showEmojiPicker && emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+            if (
+                showEmojiPicker &&
+                emojiPickerRef.current &&
+                !emojiPickerRef.current.contains(event.target as Node)
+            ) {
                 setShowEmojiPicker(false);
             }
         };
@@ -50,11 +48,10 @@ export default function WppLinkGenerator() {
         const cursorPosition = textAreaRef.current?.selectionStart || 0;
         const textBeforeCursor = message.substring(0, cursorPosition);
         const textAfterCursor = message.substring(cursorPosition);
-        
+
         setMessage(textBeforeCursor + emojiData.emoji + textAfterCursor);
         setShowGeneratedLink(false);
-        
-        // Mover o cursor para depois do emoji inserido
+
         setTimeout(() => {
             const newPosition = cursorPosition + emojiData.emoji.length;
             textAreaRef.current?.setSelectionRange(newPosition, newPosition);
@@ -80,22 +77,14 @@ export default function WppLinkGenerator() {
 
     const generateLink = (e: React.FormEvent) => {
         e.preventDefault();
-        // Remove todos os caracteres não numéricos
+
         const cleanedPhone = phone.replace(/\D/g, '');
-        // Adiciona o código do país
         const fullNumber = countryCode + cleanedPhone;
-        
-        // Primeiro, substitui as quebras de linha por \n
-        // Cria um array com as linhas da mensagem
-        const lines = message.split('\n');
-        
-        // Codifica cada linha individualmente e depois junta com %0A
-        const encodedLines = lines.map(line => encodeURIComponent(line));
-        const encodedMessage = encodedLines.join('%0A');
-        
-        // Gera o link do WhatsApp que inicia a conversa diretamente
-        const whatsappLink = `https://web.whatsapp.com/send/?phone=${fullNumber}&text=${encodedMessage}&type=phone_number&app_absent=0`;
-        
+
+        const encodedMessage = encodeURIComponent(message);
+
+        const whatsappLink = `https://wa.me/${fullNumber}${encodedMessage ? `?text=${encodedMessage}` : ''}`;
+
         setGeneratedLink(whatsappLink);
         setShowGeneratedLink(true);
     };
@@ -111,8 +100,10 @@ export default function WppLinkGenerator() {
         <Default pageTitle="Gerador de Link para WhatsApp">
             <div className="max-w-lg mx-auto p-6">
                 <div className="bg-gray-800 rounded-xl p-8 mb-8 border border-gray-700">
-                    <h2 className="text-xl font-bold mb-6 text-center text-white">Gerador de Link para WhatsApp</h2>
-                    
+                    <h2 className="text-xl font-bold mb-6 text-center text-white">
+                        Gerador de Link para WhatsApp
+                    </h2>
+
                     <form onSubmit={generateLink} className="space-y-6">
                         <div className="grid grid-cols-4 gap-4 mb-4">
                             <div>
@@ -120,7 +111,9 @@ export default function WppLinkGenerator() {
                                     País
                                 </label>
                                 <div className="flex items-center">
-                                    <span className="bg-gray-700 text-gray-300 border border-r-0 border-gray-600 rounded-l px-3 py-2">+</span>
+                                    <span className="bg-gray-700 text-gray-300 border border-r-0 border-gray-600 rounded-l px-3 py-2">
+                                        +
+                                    </span>
                                     <input
                                         type="text"
                                         value={countryCode}
@@ -135,22 +128,22 @@ export default function WppLinkGenerator() {
                                 <label className="block text-sm font-medium mb-2 text-gray-300">
                                     Número (com DDD)
                                 </label>
-                            <input
-                                type="tel"
-                                value={formatPhone(phone)}
-                                onChange={handlePhoneChange}
-                                placeholder="(00) 00000-0000"
-                                className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white"
-                                maxLength={15}
-                                required
-                            />
-                            <p className="mt-1 text-xs text-gray-400">
-                                Insira o DDD + número do telefone
-                            </p>
-                        </div>
+                                <input
+                                    type="tel"
+                                    value={formatPhone(phone)}
+                                    onChange={handlePhoneChange}
+                                    placeholder="(00) 00000-0000"
+                                    className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white"
+                                    maxLength={15}
+                                    required
+                                />
+                                <p className="mt-1 text-xs text-gray-400">
+                                    Insira o DDD + número do telefone
+                                </p>
+                            </div>
                         </div>
 
-                        <div className="mb-4">
+                        <div>
                             <label className="block text-sm font-medium mb-2 text-gray-300">
                                 Mensagem (opcional)
                             </label>
@@ -175,7 +168,7 @@ export default function WppLinkGenerator() {
                                     😊
                                 </button>
                                 {showEmojiPicker && (
-                                    <div 
+                                    <div
                                         ref={emojiPickerRef}
                                         className="absolute right-0 bottom-12 z-10"
                                         onClick={(e) => e.stopPropagation()}
@@ -184,9 +177,7 @@ export default function WppLinkGenerator() {
                                             <EmojiPicker
                                                 onEmojiClick={onEmojiClick}
                                                 autoFocusSearch={false}
-                                                previewConfig={{
-                                                    showPreview: false
-                                                }}
+                                                previewConfig={{ showPreview: false }}
                                                 searchDisabled={false}
                                                 skinTonesDisabled
                                                 lazyLoadEmojis
@@ -202,9 +193,10 @@ export default function WppLinkGenerator() {
                         <button
                             type="submit"
                             disabled={!phone}
-                            className={`cursor-pointer w-full py-2 px-4 rounded-md text-white font-medium ${
-                                !phone ? 'bg-gray-600 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-                            }`}
+                            className={`cursor-pointer w-full py-2 px-4 rounded-md text-white font-medium ${!phone
+                                ? 'bg-gray-600 cursor-not-allowed'
+                                : 'bg-green-600 hover:bg-green-700'
+                                }`}
                         >
                             Gerar Link
                         </button>
@@ -212,7 +204,9 @@ export default function WppLinkGenerator() {
 
                     {showGeneratedLink && generatedLink && (
                         <div className="mt-8 p-4 bg-gray-700 rounded-lg border border-gray-600">
-                            <h3 className="text-sm font-medium text-gray-300 mb-3">Seu link gerado:</h3>
+                            <h3 className="text-sm font-medium text-gray-300 mb-3">
+                                Seu link gerado:
+                            </h3>
                             <div className="flex">
                                 <input
                                     type="text"
