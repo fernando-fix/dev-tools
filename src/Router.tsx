@@ -12,6 +12,7 @@ import ImageResizer from './web/pages/ImageResizer';
 import ImageCropper from './web/pages/ImageCropper';
 import WppLinkGenerator from './web/pages/WppLinkGenerator';
 import CpfCnpjGenerator from './web/pages/CpfCnpjGenerator';
+import CommitGenerator from './web/pages/CommitGenerator';
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/conversor-de-imagens" element={<ImageConverter />} />
       <Route path="/base64" element={<Base64 />} />
       <Route path="/gerador-de-imagem" element={<ImageGenerator />} />
+      <Route path="/gerador-de-commits" element={<CommitGenerator />} />
       <Route path="/baixar-tiktok" element={<TikTokDownloader />} />
       <Route path="/qrcode" element={<QRCodeGenerator />} />
       <Route path="/redimensionar-imagem" element={<ImageResizer />} />
