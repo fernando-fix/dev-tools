@@ -13,6 +13,8 @@ export default function ImageGenerator() {
     const [extensao, setExtensao] = useState("webp");
     const [quality, setQuality] = useState(100);
     const [downloadSize, setDownloadSize] = useState<string>("0 KB");
+    const [useCustomText, setUseCustomText] = useState(false);
+    const [customText, setCustomText] = useState("");
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // Cálculo proporcional do tamanho da fonte
@@ -23,13 +25,30 @@ export default function ImageGenerator() {
 
     // Atualiza o fontSize se o tamanho da imagem mudar
     React.useEffect(() => {
-        setFontSize(defaultFontSize);
+        const newDefaultFontSize = Math.max(minFontSize, Math.floor(Math.min(largura, altura) / 4));
+        const newMaxFontSize = Math.max(minFontSize, Math.floor(Math.min(largura, altura) / 2));
+        
+        // Ajusta o fontSize atual se for maior que o novo máximo
+        if (fontSize > newMaxFontSize) {
+            setFontSize(newDefaultFontSize);
+        }
     }, [largura, altura]);
 
     // Gera SVG string
     const gerarSVG = () => {
-        const texto = `${largura}x${altura}`;
-        return `<?xml version='1.0' encoding='UTF-8'?>\n<svg viewBox='0 0 ${largura} ${altura}' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='${bgColor}'/><text x='50%' y='50%' dy='.32em' text-anchor='middle' dominant-baseline='middle' alignment-baseline='middle' font-size='${fontSize}' fill='${textColor}' font-family='Arial, sans-serif'>${texto}</text></svg>`;
+        const texto = useCustomText ? customText : `${largura}x${altura}`;
+        const linhas = texto.split('\n');
+        const lineHeight = fontSize * 1.2;
+        const totalHeight = linhas.length * lineHeight;
+        const startY = (altura - totalHeight) / 2 + lineHeight / 2;
+        
+        let textElements = '';
+        linhas.forEach((linha, index) => {
+            const y = startY + (index * lineHeight);
+            textElements += `<text x='50%' y='${y}' text-anchor='middle' dominant-baseline='middle' alignment-baseline='middle' font-size='${fontSize}' fill='${textColor}' font-family='Arial, sans-serif'>${linha}</text>`;
+        });
+        
+        return `<?xml version='1.0' encoding='UTF-8'?>\n<svg viewBox='0 0 ${largura} ${altura}' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' fill='${bgColor}'/>${textElements}</svg>`;
     };
 
     // Desenha no canvas
@@ -46,14 +65,24 @@ export default function ImageGenerator() {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = `${fontSize}px Arial`;
-        ctx.fillText(`${largura}x${altura}`, largura / 2, altura / 2);
+        
+        const texto = useCustomText ? customText : `${largura}x${altura}`;
+        const linhas = texto.split('\n');
+        const lineHeight = fontSize * 1.2;
+        const totalHeight = linhas.length * lineHeight;
+        const startY = (altura - totalHeight) / 2 + lineHeight / 2;
+        
+        linhas.forEach((linha, index) => {
+            const y = startY + (index * lineHeight);
+            ctx.fillText(linha, largura / 2, y);
+        });
     };
 
     React.useEffect(() => {
         if (extensao !== "svg") {
             desenharCanvas();
         }
-    }, [largura, altura, bgColor, textColor, extensao, fontSize]);
+    }, [largura, altura, bgColor, textColor, extensao, fontSize, useCustomText, customText]);
 
     // Função para formatar tamanho
     const formatFileSize = (bytes: number): string => {
@@ -86,7 +115,7 @@ export default function ImageGenerator() {
                 setDownloadSize(formatFileSize(blob.size));
             }, mime, qualityValue);
         }
-    }, [largura, altura, bgColor, textColor, extensao, quality, fontSize]);
+    }, [largura, altura, bgColor, textColor, extensao, quality, fontSize, useCustomText, customText]);
 
     // Download
     const baixar = () => {
@@ -228,6 +257,26 @@ export default function ImageGenerator() {
                                     onChange={e => setFontSize(Number(e.target.value))}
                                     className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                                 />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="flex items-center gap-2 text-sm font-medium mb-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={useCustomText}
+                                        onChange={e => setUseCustomText(e.target.checked)}
+                                        className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                                    />
+                                    Usar texto personalizado
+                                </label>
+                                {useCustomText && (
+                                    <textarea
+                                        value={customText}
+                                        onChange={e => setCustomText(e.target.value)}
+                                        placeholder="Digite seu texto aqui...\nUse Enter para pular linhas"
+                                        className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white resize-none"
+                                        rows={3}
+                                    />
+                                )}
                             </div>
                         </div>
                         <button onClick={baixar} className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-colors duration-200 text-lg font-semibold">Salvar Imagem</button>
